@@ -23,7 +23,9 @@ export async function GET(request: Request) {
         const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${encodeURIComponent(query)}&type=video&videoCategoryId=10&key=${apiKey}`);
 
         if (!res.ok) {
-            throw new Error(`YouTube API Error: ${res.statusText}`);
+            const ytError = await res.text();
+            console.error(`YouTube API Error [${res.status}]:`, ytError);
+            return NextResponse.json({ error: 'YouTube API Rejected Request', details: ytError }, { status: res.status });
         }
 
         const data = await res.json();
@@ -31,14 +33,14 @@ export async function GET(request: Request) {
         if (data.items && data.items.length > 0) {
             return NextResponse.json({ videoId: data.items[0].id.videoId }, {
                 headers: {
-                    'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200' // Cache per Spotify track ID equivalents for 10 minutes strictly to prevent quota abuse
+                    'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200'
                 }
             });
         }
 
         return NextResponse.json({ videoId: null }, { status: 404 });
-    } catch (error) {
+    } catch (error: any) {
         console.error("YouTube search error:", error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: 'Internal Server Error', message: error.message }, { status: 500 });
     }
 }
