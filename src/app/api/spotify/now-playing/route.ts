@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID || 'c1b7629bd68641a299447cc202fda899';
-const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET || '267defce257b48a991171c21ce00f9c2';
-const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN || 'AQBv4hD6BPDsEZwZWdJPhBdQ4hkrSeywWzoGH_GzQ4vJPxOJCJGaTvT21H3SVJWuUnAN4QSsykS8jd3QdpwRbk5yNm4uS67scO_bzc7RG7zIeGyojoMxbr97k1QXP4Xj0Gc';
+const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID || '';
+const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET || '';
+const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN || '';
 
 const basic = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
 const NOW_PLAYING_ENDPOINT = 'https://api.spotify.com/v1/me/player/currently-playing';
