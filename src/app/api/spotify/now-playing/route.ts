@@ -1,5 +1,16 @@
 import { NextResponse } from 'next/server';
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+
+// Initialize Redis client silently without throwing hard crashes inside dev mode if keys are missing
+const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+
+const redis = (redisUrl && redisToken)
+    ? new Redis({
+        url: redisUrl,
+        token: redisToken,
+    })
+    : null;
 
 export const dynamic = 'force-dynamic';
 
@@ -86,26 +97,26 @@ export async function GET() {
 
             // Fire and forget cache save
             try {
-                if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-                    kv.set("last_played_song", JSON.stringify(payload)).catch(e => console.error("KV Save Background Error:", e));
+                if (redis) {
+                    redis.set("last_played_song", JSON.stringify(payload)).catch(e => console.error("Upstash Save Background Error:", e));
                 }
             } catch (e) {
-                console.error("KV Setup Error:", e);
+                console.error("Upstash Setup Error:", e);
             }
 
             return NextResponse.json(payload, { status: 200 });
         } else {
             // Entirely Offline - Dig into Redis Cache
             try {
-                if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-                    const cachedSong = await kv.get("last_played_song");
+                if (redis) {
+                    const cachedSong = await redis.get("last_played_song");
                     if (cachedSong) {
                         const parsed = typeof cachedSong === 'string' ? JSON.parse(cachedSong) : cachedSong;
                         return NextResponse.json({ ...parsed, isPlaying: false, progressMs: 0 }, { status: 200 });
                     }
                 }
             } catch (dbError) {
-                console.error("Redis Cache Fetch Error:", dbError);
+                console.error("Upstash Redis Cache Fetch Error:", dbError);
             }
             return NextResponse.json({ isPlaying: false }, { status: 200 });
         }
