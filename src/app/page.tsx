@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { motion, Variants } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import SpotifyPlayer from "./components/spotify-player";
 
 export default function Home() {
+  const [isPlaying, setIsPlaying] = useState<boolean | null>(null);
+
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -49,8 +52,16 @@ export default function Home() {
         >
           i do things. some main quests, mostly side quests.
         </motion.p>
-        <motion.div variants={itemVariants} className="mt-8">
-          <SpotifyPlayer />
+
+        <motion.p
+          variants={itemVariants}
+          className={`text-lg sm:text-xl text-foreground/80 font-medium max-w-xl mt-4 transition-opacity duration-300 ${isPlaying === null ? 'opacity-0' : 'opacity-100'}`}
+        >
+          {isPlaying ? "what i'm listening to rn" : "i last listened to:"}
+        </motion.p>
+
+        <motion.div variants={itemVariants} className="mt-2">
+          <SpotifyPlayer onPlaybackChange={setIsPlaying} />
         </motion.div>
       </motion.section>
 

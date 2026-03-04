@@ -14,7 +14,11 @@ interface SpotifyData {
     durationMs?: number;
 }
 
-export default function SpotifyPlayer() {
+interface SpotifyPlayerProps {
+    onPlaybackChange?: (isPlaying: boolean) => void;
+}
+
+export default function SpotifyPlayer({ onPlaybackChange }: SpotifyPlayerProps = {}) {
     const [data, setData] = useState<SpotifyData | null>(null);
     const rotationRef = useRef(0);
     const requestRef = useRef<number>(0);
@@ -45,6 +49,10 @@ export default function SpotifyPlayer() {
         const interval = setInterval(fetchNowPlaying, 2000);
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        if (data) onPlaybackChange?.(data.isPlaying);
+    }, [data?.isPlaying, onPlaybackChange]);
 
     const animate = () => {
         if (data?.isPlaying) {

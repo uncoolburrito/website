@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { kv } from '@vercel/kv';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,12 @@ const getAccessToken = async () => {
         }),
         cache: 'no-store'
     });
-    return response.json();
+
+    const data = await response.json();
+    if (!response.ok) {
+        console.error("Spotify Token Fetch Error:", data);
+    }
+    return data;
 };
 
 export async function GET() {
@@ -57,31 +63,52 @@ export async function GET() {
             }
         }
 
-        if (!songObj || !songObj.item) {
+        if (songObj && songObj.item) {
+            const isPlaying = songObj.is_playing;
+            const title = songObj.item.name;
+            const artist = songObj.item.artists.map((_artist: any) => _artist.name).join(', ');
+            const album = songObj.item.album.name;
+            const albumArt = songObj.item.album.images[0]?.url;
+            const spotifyUrl = songObj.item.external_urls?.spotify || '';
+            const progressMs = songObj.progress_ms || 0;
+            const durationMs = songObj.item.duration_ms || 0;
+
+            const payload = {
+                album,
+                albumArt,
+                artist,
+                isPlaying,
+                spotifyUrl,
+                title,
+                progressMs,
+                durationMs,
+            };
+
+            // Fire and forget cache save
+            try {
+                if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+                    kv.set("last_played_song", JSON.stringify(payload)).catch(e => console.error("KV Save Background Error:", e));
+                }
+            } catch (e) {
+                console.error("KV Setup Error:", e);
+            }
+
+            return NextResponse.json(payload, { status: 200 });
+        } else {
+            // Entirely Offline - Dig into Redis Cache
+            try {
+                if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+                    const cachedSong = await kv.get("last_played_song");
+                    if (cachedSong) {
+                        const parsed = typeof cachedSong === 'string' ? JSON.parse(cachedSong) : cachedSong;
+                        return NextResponse.json({ ...parsed, isPlaying: false, progressMs: 0 }, { status: 200 });
+                    }
+                }
+            } catch (dbError) {
+                console.error("Redis Cache Fetch Error:", dbError);
+            }
             return NextResponse.json({ isPlaying: false }, { status: 200 });
         }
-
-        const isPlaying = songObj.is_playing;
-        const title = songObj.item.name;
-        const artist = songObj.item.artists.map((_artist: any) => _artist.name).join(', ');
-        const album = songObj.item.album.name;
-        const albumArt = songObj.item.album.images[0]?.url;
-        const spotifyUrl = songObj.item.external_urls?.spotify || '';
-        const progressMs = songObj.progress_ms || 0;
-        const durationMs = songObj.item.duration_ms || 0;
-
-        return NextResponse.json({
-            album,
-            albumArt,
-            artist,
-            isPlaying,
-            spotifyUrl,
-            title,
-            progressMs,
-            durationMs,
-        }, {
-            status: 200,
-        });
     } catch (error) {
         return NextResponse.json({ isPlaying: false }, { status: 200 });
     }
