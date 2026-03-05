@@ -15,7 +15,7 @@ const BLOGS = [
 
 export default function BlogsPage() {
     return (
-        <div className="w-full max-w-3xl flex flex-col gap-12 px-6 py-24 sm:py-32">
+        <div className="w-full max-w-3xl flex flex-col gap-8 sm:gap-12 px-5 sm:px-6 py-16 sm:py-32">
             <section className="flex flex-col mb-4">
                 <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground mb-4">
                     blogs

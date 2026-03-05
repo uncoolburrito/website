@@ -32,7 +32,7 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full max-w-3xl flex flex-col justify-center min-h-[60vh] gap-32 px-6 py-24 sm:py-32">
+    <div className="w-full max-w-3xl flex flex-col justify-center min-h-[60vh] gap-16 sm:gap-32 px-5 sm:px-6 py-16 sm:py-32">
       {/* Hero Section */}
       <motion.section
         variants={containerVariants}

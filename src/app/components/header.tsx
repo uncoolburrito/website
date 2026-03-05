@@ -9,7 +9,9 @@ export default function Header() {
     const [currentTheme, setCurrentTheme] = useState("theme5");
     const [mounted, setMounted] = useState(false);
     const [beyondOpen, setBeyondOpen] = useState(false);
+    const [themesOpen, setThemesOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const themesRef = useRef<HTMLDivElement>(null);
 
     // Exact themes from reference
     const themes = [
@@ -31,6 +33,9 @@ export default function Header() {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setBeyondOpen(false);
             }
+            if (themesRef.current && !themesRef.current.contains(event.target as Node)) {
+                setThemesOpen(false);
+            }
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -49,9 +54,9 @@ export default function Header() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-5xl mx-auto px-6 py-8 flex justify-between items-center z-50 relative"
+            className="w-full max-w-5xl mx-auto px-6 py-6 sm:py-8 flex justify-between items-center z-50 relative"
         >
-            <nav className="flex items-center gap-2 sm:gap-4 z-10 w-full sm:w-auto">
+            <nav className="flex items-center flex-wrap sm:flex-nowrap gap-2 lg:gap-4 z-10 w-auto">
                 <Link href="/" className={linkClass}>
                     home
                 </Link>
@@ -65,10 +70,21 @@ export default function Header() {
                 <div
                     className="relative"
                     ref={dropdownRef}
-                    onMouseEnter={() => setBeyondOpen(true)}
-                    onMouseLeave={() => setBeyondOpen(false)}
+                    onMouseEnter={() => {
+                        if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+                            setBeyondOpen(true);
+                        }
+                    }}
+                    onMouseLeave={() => {
+                        if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+                            setBeyondOpen(false);
+                        }
+                    }}
                 >
-                    <button className="text-sm font-medium text-foreground/80 hover:bg-foreground hover:text-background pl-3 pr-2.5 py-1.5 rounded-full transition-all duration-300 ease-out hover:scale-105 active:scale-95 flex items-center gap-1 cursor-pointer">
+                    <button
+                        onClick={() => setBeyondOpen(!beyondOpen)}
+                        className="text-sm font-medium text-foreground/80 hover:bg-foreground hover:text-background pl-3 pr-2.5 py-1.5 rounded-full transition-all duration-300 ease-out hover:scale-105 active:scale-95 flex items-center gap-1 cursor-pointer"
+                    >
                         beyond
                         <ChevronDown className={`w-[14px] h-[14px] transition-transform duration-300 opacity-60 ${beyondOpen ? '-rotate-180' : 'rotate-0'}`} />
                     </button>
@@ -94,7 +110,8 @@ export default function Header() {
                 </div>
             </nav>
 
-            <div className="flex justify-end items-center gap-1 w-auto lg:w-32 z-10">
+            {/* Desktop Horizontal Themes */}
+            <div className="hidden sm:flex justify-end items-center gap-1 w-auto lg:w-32 z-10">
                 {mounted && themes.map((theme) => (
                     <button
                         key={theme.id}
@@ -110,6 +127,50 @@ export default function Header() {
                         />
                     </button>
                 ))}
+            </div>
+
+            {/* Mobile Vertical Dropdown Themes */}
+            <div className="sm:hidden relative z-50 flex items-center" ref={themesRef}>
+                {mounted && (
+                    <button
+                        onClick={() => setThemesOpen(!themesOpen)}
+                        className="relative flex items-center justify-center gap-0.5 pl-2 pr-1.5 h-8 rounded-full transition-all duration-300 active:scale-90 border border-foreground/10 shadow-sm bg-background/50 backdrop-blur-md"
+                    >
+                        <span
+                            className="w-4 h-4 rounded-full border-2 transition-all duration-300 border-foreground/50"
+                            style={{ backgroundColor: themes.find(t => t.id === currentTheme)?.bgColor || '#0C0C0C' }}
+                        />
+                        <ChevronDown className={`w-[12px] h-[12px] opacity-60 transition-transform duration-300 ${themesOpen ? '-rotate-180' : 'rotate-0'}`} />
+                    </button>
+                )}
+                <AnimatePresence>
+                    {themesOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute top-full right-0 mt-3 p-2 bg-background/90 backdrop-blur-xl border border-foreground/10 rounded-full shadow-xl flex flex-col gap-2"
+                        >
+                            {themes.map((theme) => (
+                                <button
+                                    key={theme.id}
+                                    onClick={() => {
+                                        handleThemeChange(theme.id);
+                                        setThemesOpen(false);
+                                    }}
+                                    title={theme.name}
+                                    className="relative flex items-center justify-center w-8 h-8 rounded-full transition-all hover:scale-110 active:scale-90"
+                                >
+                                    <span
+                                        className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${currentTheme === theme.id ? 'scale-110 opacity-100 shadow-sm border-foreground/50' : 'opacity-50 border-foreground/5'}`}
+                                        style={{ backgroundColor: theme.bgColor }}
+                                    />
+                                </button>
+                            ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
             {/* Mobile simplified theme swither placeholder to keep flex spacing intact if needed */}
         </motion.header>

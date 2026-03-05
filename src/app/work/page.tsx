@@ -58,7 +58,7 @@ export default function WorkPage() {
     };
 
     return (
-        <div className="w-full max-w-3xl flex flex-col gap-16 px-6 py-24 sm:py-32">
+        <div className="w-full max-w-3xl flex flex-col gap-12 sm:gap-16 px-5 sm:px-6 py-16 sm:py-32">
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -87,7 +87,7 @@ export default function WorkPage() {
                         <motion.article
                             key={idx}
                             variants={itemVariants}
-                            className="relative group p-4 -mx-4 rounded-3xl hover:bg-foreground/5 transition-all duration-300"
+                            className="relative group p-4 -mx-2 sm:-mx-4 rounded-3xl hover:bg-foreground/5 transition-all duration-300"
                         >
                             {/* Timeline Dot */}
                             <div className="absolute -left-[32px] top-[26px] w-[14px] h-[14px] rounded-full bg-background border-2 border-foreground/30 group-hover:border-foreground group-hover:scale-125 transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.1)] z-10" />

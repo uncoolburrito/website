@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function BlogPost() {
     return (
-        <div className="w-full max-w-2xl mx-auto flex flex-col px-6 py-24 sm:py-32">
+        <div className="w-full max-w-2xl mx-auto flex flex-col px-5 sm:px-6 py-16 sm:py-32">
             <Link href="/blogs" className="text-foreground/50 hover:text-foreground transition-colors flex items-center gap-2 mb-12 w-fit">
                 <ArrowLeft className="w-4 h-4" />
                 back to blogs

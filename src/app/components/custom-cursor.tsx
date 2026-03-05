@@ -37,6 +37,7 @@ export default function CustomCursor() {
     const [isVisible, setIsVisible] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
@@ -47,6 +48,11 @@ export default function CustomCursor() {
 
     useEffect(() => {
         setMounted(true);
+        if (window.matchMedia("(any-pointer: coarse)").matches) {
+            setIsMobile(true);
+            return;
+        }
+
         const defaultCursorElements = ["A", "BUTTON", "INPUT", "TEXTAREA", "SELECT", "LABEL"];
         const handleMouseMove = (e: MouseEvent) => {
             mouseX.set(e.clientX);
@@ -90,7 +96,7 @@ export default function CustomCursor() {
         };
     }, [mouseX, mouseY, isVisible]);
 
-    if (!mounted) return null;
+    if (!mounted || isMobile) return null;
 
     return (
         <>
