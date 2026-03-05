@@ -50,11 +50,10 @@
 }
 
 /* Global Aesthetics */
-body:not(.default-cursor),
+/* body:not(.default-cursor),
 body:not(.default-cursor) * {
-  /* Enforce custom cursor globally */
   cursor: none !important;
-}
+} */
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 ::-webkit-scrollbar {
