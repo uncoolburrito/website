@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import CustomCursor from "./components/custom-cursor";
+// import CustomCursor from "./components/custom-cursor";
 import YouTubeAmbientEngine from "./components/youtube-ambient-engine";
 import Header from "./components/header";
 import "./globals.css";
@@ -43,7 +43,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <CustomCursor />
+        {/* <CustomCursor /> */}
         <YouTubeAmbientEngine />
         <Header />
         <main className="w-full flex flex-col items-center">
