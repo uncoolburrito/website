@@ -1,9 +1,11 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import ScrollProgressBar from "../../components/ScrollProgressBar";
 
 export default function BlogPost() {
     return (
         <div className="w-full max-w-2xl mx-auto flex flex-col px-5 sm:px-6 py-16 sm:py-32">
+            <ScrollProgressBar />
             <Link href="/blogs" className="text-foreground/50 hover:text-foreground transition-colors flex items-center gap-2 mb-12 w-fit">
                 <ArrowLeft className="w-4 h-4" />
                 back to blogs
