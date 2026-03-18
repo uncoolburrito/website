@@ -47,7 +47,7 @@ export default function Header() {
         document.documentElement.setAttribute("data-theme", themeId);
     };
 
-    const linkClass = "text-sm font-medium text-foreground/80 hover:bg-foreground hover:text-background px-3 py-1.5 rounded-full transition-all duration-300 ease-out hover:scale-105 active:scale-95 inline-block cursor-pointer";
+    const linkClass = "text-[13px] sm:text-sm font-medium text-foreground/80 hover:bg-foreground hover:text-background px-2.5 sm:px-3 py-1.5 rounded-full transition-all duration-300 ease-out hover:scale-105 active:scale-95 inline-block cursor-pointer";
 
     return (
         <motion.header
@@ -56,7 +56,7 @@ export default function Header() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-5xl mx-auto px-6 py-6 sm:py-8 flex justify-between items-center z-50 relative"
         >
-            <nav className="flex items-center flex-wrap sm:flex-nowrap gap-2 lg:gap-4 z-10 w-auto">
+            <nav className="flex items-center flex-wrap sm:flex-nowrap gap-1 sm:gap-2 lg:gap-3 z-10 w-auto">
                 <Link href="/" className={linkClass}>
                     home
                 </Link>
@@ -65,6 +65,9 @@ export default function Header() {
                 </Link>
                 <Link href="/blogs" className={linkClass}>
                     blogs
+                </Link>
+                <Link href="/projects" className={linkClass}>
+                    projects
                 </Link>
 
                 <div
