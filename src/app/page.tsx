@@ -89,7 +89,7 @@ export default function Home() {
             © {new Date().getFullYear()} Ramiz Rahman
           </p>
           <p className="text-xs text-foreground/30 font-medium tracking-tight">
-            theme selector design by <a href="https://www.avansear.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground/60 transition-colors">Avansear</a>
+            theme selector design by <a href="https://www.avansear.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground/60 transition-colors">avansear</a>
           </p>
         </motion.div>
       </motion.footer>
