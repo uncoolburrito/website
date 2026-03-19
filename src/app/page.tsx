@@ -84,9 +84,14 @@ export default function Home() {
           </a>
         </motion.div>
 
-        <motion.p variants={itemVariants} className="text-sm text-foreground/40 font-medium tracking-tight">
-          © {new Date().getFullYear()} Ramiz Rahman
-        </motion.p>
+        <motion.div variants={itemVariants} className="flex flex-col sm:items-end gap-1">
+          <p className="text-sm text-foreground/40 font-medium tracking-tight">
+            © {new Date().getFullYear()} Ramiz Rahman
+          </p>
+          <p className="text-xs text-foreground/30 font-medium tracking-tight">
+            theme selector design by <a href="https://www.avansear.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground/60 transition-colors">Avansear</a>
+          </p>
+        </motion.div>
       </motion.footer>
     </div>
   );
