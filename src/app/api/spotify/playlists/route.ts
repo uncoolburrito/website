@@ -2,11 +2,9 @@ import { NextResponse } from 'next/server';
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID || '';
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET || '';
-const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN || '';
 
 const basic = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
 const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
-const PLAYLISTS_ENDPOINT = 'https://api.spotify.com/v1/me/playlists?limit=50';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,9 +20,7 @@ const getAccessToken = async () => {
         }),
         cache: 'no-store'
     });
-
-    const data = await response.json();
-    return data;
+    return await response.json();
 };
 
 export async function GET() {
@@ -33,12 +29,13 @@ export async function GET() {
 
         let favourites: any[] = [];
         let newFinds: any[] = [];
+        let hasQuotaError = false;
         
         // Helper to map tracks
         const mapTracks = (items: any[]) => items
             .filter((item: any) => item.track)
             .map((item: any) => ({
-                id: item.track.id + Math.random().toString(), // fallback to avoid identical keys duplicate
+                id: item.track.id + Math.random().toString(),
                 title: item.track.name,
                 artist: item.track.artists.map((a: any) => a.name).join(', '),
                 album: item.track.album.name,
@@ -47,32 +44,36 @@ export async function GET() {
                 addedAt: item.added_at,
             }));
 
-        // 1. Fetch tracks for favourites
         const favouritesId = "3UXShJ6695LXudDV774vFh";
         const resFav = await fetch(`https://api.spotify.com/v1/playlists/${favouritesId}/tracks?limit=20`, {
             headers: { Authorization: `Bearer ${access_token}` },
             cache: 'no-store',
         });
+        
         if (resFav.ok) {
             const data = await resFav.json();
             favourites = mapTracks(data.items);
-        } else {
-            console.error("Error fetching favourites:", await resFav.text());
+        } else if (resFav.status === 403) {
+            hasQuotaError = true;
         }
         
-        // 2. Fetch tracks for new finds
         const newFindsId = "02AxJ0YCbrQMkmGRzWnjP2";
         const resNew = await fetch(`https://api.spotify.com/v1/playlists/${newFindsId}/tracks?limit=20`, {
             headers: { Authorization: `Bearer ${access_token}` },
             cache: 'no-store',
         });
+        
         if (resNew.ok) {
             const data = await resNew.json();
             newFinds = mapTracks(data.items);
-        } else {
-             console.error("Error fetching new finds:", await resNew.text());
+        } else if (resNew.status === 403) {
+            hasQuotaError = true;
         }
         
+        if (hasQuotaError) {
+             return NextResponse.json({ error: 'Spotify API Quota Restricted. Your App needs Extended Access to read tracks.' }, { status: 403 });
+        }
+
         return NextResponse.json({ favourites, newFinds });
     } catch (error) {
         console.error("Spotify Playlists API Error", error);
