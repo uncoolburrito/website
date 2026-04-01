@@ -246,6 +246,7 @@ export default function YouTubeAmbientEngine() {
                 }
 
                 setIsPlayingAudio(false);
+                window.dispatchEvent(new CustomEvent('ambient-audio-state', { detail: false }));
             }, 500); // Mute after fade
         } else {
             // Fade in and correct drift completely
@@ -265,6 +266,7 @@ export default function YouTubeAmbientEngine() {
 
             fadeVolume(60, 500);
             setIsPlayingAudio(true);
+            window.dispatchEvent(new CustomEvent('ambient-audio-state', { detail: true }));
         }
     };
 

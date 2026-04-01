@@ -24,6 +24,13 @@ export default function SpotifyPlayer({ onPlaybackChange }: SpotifyPlayerProps =
     const requestRef = useRef<number>(0);
     const lastUpdateRef = useRef<number>(Date.now());
     const progressRef = useRef<number>(0);
+    const isAmbientPlayingRef = useRef(false);
+
+    useEffect(() => {
+        const handleAmbient = (e: any) => { isAmbientPlayingRef.current = e.detail; };
+        window.addEventListener('ambient-audio-state', handleAmbient);
+        return () => window.removeEventListener('ambient-audio-state', handleAmbient);
+    }, []);
 
     const fetchNowPlaying = async () => {
         try {
@@ -55,7 +62,9 @@ export default function SpotifyPlayer({ onPlaybackChange }: SpotifyPlayerProps =
     }, [data?.isPlaying, onPlaybackChange]);
 
     const animate = () => {
-        if (data?.isPlaying) {
+        const isSpinning = data?.isPlaying || isAmbientPlayingRef.current;
+        
+        if (isSpinning) {
             const now = Date.now();
             const delta = now - lastUpdateRef.current;
             lastUpdateRef.current = now;
@@ -70,8 +79,8 @@ export default function SpotifyPlayer({ onPlaybackChange }: SpotifyPlayerProps =
             const el = document.getElementById('spotify-vinyl');
             if (el) el.style.transform = `rotate(${rotationRef.current}deg)`;
 
-            // Update Progress Bar
-            if (data.durationMs) {
+            // Update Progress Bar ONLY if actually playing
+            if (data?.isPlaying && data.durationMs) {
                 progressRef.current += cappedDelta;
                 const percentage = Math.min(1, progressRef.current / data.durationMs);
                 const radius = 26;
@@ -83,7 +92,11 @@ export default function SpotifyPlayer({ onPlaybackChange }: SpotifyPlayerProps =
                     progEl.style.strokeDashoffset = `${offset}`;
                 }
             }
+        } else {
+            // Keep lastUpdateRef fresh so delta doesn't explode when we start spinning
+            lastUpdateRef.current = Date.now();
         }
+        
         requestRef.current = requestAnimationFrame(animate);
     };
 
@@ -135,7 +148,7 @@ export default function SpotifyPlayer({ onPlaybackChange }: SpotifyPlayerProps =
 
                     {albumArt ? (
                         <img
-                            id={isPlaying ? "spotify-vinyl" : undefined}
+                            id={!isLoading ? "spotify-vinyl" : undefined}
                             src={albumArt}
                             alt="Album art"
                             className="absolute inset-0 w-full h-full object-cover rounded-full transition-transform duration-0"
